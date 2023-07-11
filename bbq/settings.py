@@ -14,7 +14,7 @@ from pathlib import Path
 import os
 from .config import SECRET_KEY as secret
 from .config import ALLOWED_HOSTS as allowed_hosts
-from .config import POSTGRES_URL, PGNAME, USER, POSTGRES_PASSWORD, PGHOST, PGPORT
+from .config import PGNAME, USER, POSTGRES_PASSWORD, PGHOST, PGPORT
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
