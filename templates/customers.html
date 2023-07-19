@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% load humanize %}
+
 {% block content %}
 
 <div class="col-md-6 offset-md-3">
@@ -13,9 +15,10 @@
                 <tr>
                     <th scope="col">#</th>
                     <th scope="col">Name</th>
-                    <th scope="col">Telegram ID</th>
                     <th scope="col">Phone Number</th>
                     <th scope="col">Registered at</th>
+                    <th scope="col">Last Order</th>
+                    <th scope="col">Number of orders</th>
                 </tr>
             </thead>
             <tbody>
@@ -23,9 +26,36 @@
                 <tr>
                     <td>{{ customer.id }}</td>
                     <td>{{ customer.first_name }}</td>
-                    <td>{{ customer.telegram_id }}</td>
                     <td>{{ customer.phone_number }}</td>
                     <td>{{ customer.registered_at }}</td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-secondary align-middle" data-bs-toggle="modal" data-bs-target="#exampleModal{{ customer.id }}">
+                          Click to see
+                        </button>
+                        <!-- Modal -->
+                        <div class="modal fade" id="exampleModal{{ customer.id }}" tabindex="-1" aria-labelledby="exampleModalLabel"
+                          aria-hidden="true">
+                          <div class="modal-dialog">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel"; style="color:rgb(20, 31, 99)">Order #{{ customer.last_order.id }}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                              </div>
+                              <div class="modal-body text-start">
+                                <p>Items: <b>{{ customer.last_order.items|linebreaksbr }}</b></p>
+                                <p>Payment Method: <b>{{ customer.last_order.payment_method }}</b></p>
+                                <p>Address: <b>{{ customer.last_order.address }}</b></p>
+                                <p>Total: <b>{{ customer.last_order.sum|intcomma }} UZS</b></p>
+                              </div>
+                              <div class="modal-footer">
+                                <p>Status: <b>{{ customer.last_order.status }}</b></p>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="text-center align-middle"><a href="{% url 'customer_orders' customer.telegram_id %}"; class="btn-link"> {{ customer.number_of_orders }} order(s)</a></td>
                 </tr>
                 {% endfor %}
             </tbody>

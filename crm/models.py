@@ -7,6 +7,7 @@ from django.utils.translation import gettext_lazy as _
 # Create your models here.
 
 class Customer(AbstractBaseUser):
+    # Customer model for Users that inherits from AbstractBaseUser
 
     telegram_id = models.CharField(max_length=20, unique=True)
     first_name = models.CharField(max_length=50)
@@ -16,7 +17,20 @@ class Customer(AbstractBaseUser):
     registered_at = models.DateTimeField(auto_now_add=True)
     password = None
 
+    def number_of_orders(self):
+        # Displays number of orders initiated by a customer
 
+        count = Order.objects.filter(customer=self.telegram_id).count()
+        return count
+
+    number_of_orders.short_description = "Orders"
+
+    def last_order(self):
+        # Last order of a customer
+
+        last_order = Order.objects.filter(customer=self.telegram_id).last()
+        return last_order
+    
     def __str__(self):
         return self.first_name
 
@@ -35,6 +49,7 @@ class Category(models.Model):
 
 
 class Product(models.Model):
+    # Model for all the available products
 
     Drinks = (('Sprite', 'Sprite'), ('Coca-Cola', 'Coca-Cola'), ('Fanta', 'Fanta'))
     Snacks = (('Potato Balls', 'Potato Balls'), ('French Fries', 'French Fries'), ('Country Style Potato', 'Country Style Potato'))
@@ -63,6 +78,7 @@ class Product(models.Model):
     
 
 class Cart(models.Model):
+    # Model for storing different customers' carts (of products)
 
     customer = models.ForeignKey(Customer, to_field='telegram_id', on_delete=models.CASCADE)
     product_id = models.ForeignKey(Product, on_delete=models.CASCADE)
@@ -71,24 +87,53 @@ class Cart(models.Model):
 
 
 class Order(models.Model):
+    # Model for orders initiated by customers
+
+    statuses = (("Pending", "Pending"), ("In Progress", "In Progress"), ("On Delivery", "On Delivery"),
+                ("Finished", "Finished"), ("Cancelled", "Cancelled"))
+    
+    payment_methods = (("Click", "Click"), ("Payme", "Payme"), ("Cash", "Cash"))
 
     customer = models.ForeignKey(Customer, to_field='telegram_id', on_delete=models.SET_NULL, null=True)
-    order_items = models.TextField()
-    payment_method = models.CharField(max_length=10)
-    order_address = models.CharField(max_length=250, null=True, blank=True)
-    order_comment = models.CharField(max_length=500, null=True, blank=True)
-    order_sum = models.IntegerField()
-    order_status = models.CharField(max_length=15, null=True)
+    items = models.TextField()
+    payment_method = models.CharField(choices=payment_methods, max_length=5)
+    address = models.CharField(max_length=250, null=True, blank=True)
+    comment = models.CharField(max_length=500, null=True, blank=True)
+    sum = models.IntegerField()
+    status = models.CharField(choices=statuses, default="Pending", max_length=12)
+    is_paid = models.BooleanField(_("Paid"), default=False)
+    is_refunded = models.BooleanField(_("Refunded"), default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.customer}'s order"
+
+    @property
+    def is_paid_online(self):
+        # Whether order is paid online or not
+        return self.payment_method in ("Payme", "Click")
+    
+    def change_status(self, new_status):
+        # Changes the status of the order
+
+        if new_status not in (status[0] for status in self.statuses):
+            raise ValueError("Such status does not exist")
+        if self.is_paid_online:
+            if new_status == "In Progress":
+                self.is_paid = True
+            elif self.status in ("In Progress", "On Delivery") and new_status == "Cancelled":
+                self.is_refunded = True
+        else:
+            if new_status == "Finished":
+                self.is_paid = True
+        self.status = new_status      
+        self.save()
     
 
 class Comment(models.Model):
 
     customer = models.ForeignKey(Customer, to_field='telegram_id', on_delete=models.SET_NULL, null=True)
-    created_on = models.DateTimeField(_("Createad On"), auto_now_add=True)
+    created_at = models.DateTimeField(_("Createad At"), auto_now_add=True)
     comment = models.TextField()
 
     def __str__(self):
@@ -102,8 +147,8 @@ class CustomerAddress(models.Model):
     address_text = models.CharField(max_length=250, null=True, blank=True)
     
     def save(self, *args, **kwargs):
-        address = CustomerAddress.objects.all().filter(customer=self.customer)
-        if len(address) == 5:
+        addresses = CustomerAddress.objects.all().filter(customer=self.customer)
+        if len(addresses) == 5:
             first_address = CustomerAddress.objects.all().filter(customer=self.customer).first()
             first_address.delete()
         super(CustomerAddress, self).save(*args, **kwargs)

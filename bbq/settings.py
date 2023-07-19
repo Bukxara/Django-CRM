@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'api',
     'rest_framework',
     'rest_framework.authtoken',
+    'django.contrib.humanize',
 ]
 
 MIDDLEWARE = [
@@ -84,7 +85,6 @@ WSGI_APPLICATION = 'bbq.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        # 'URL': POSTGRES_URL,
         'NAME': PGNAME,
         'USER': USER,
         'PASSWORD': POSTGRES_PASSWORD,

@@ -1,110 +1,123 @@
 {% extends 'base.html' %}
+{% load humanize %}
 
 {% block content %}
-
 
 {% if user.is_authenticated %}
 
 {% if orders %}
 
-
-
 <div class=" container-fluid row">
 
-  <div class="col-6">
+  <!-- 1st table -->
+  <div class="col-4">
+    <table class="table table-striped table-hover table-bordered table align-middle table table-sm">
+      <h1>Pending</h1>
+      <thead class="table-dark">
+        <tr class="align-middle text-center">
+          <th scope="col">#</th>
+          <th scope="col">Customer</th>
+          <th scope="col">Products</th>
+          <th scope="col">Payment method</th>
+          <th scope="col">Change status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in pending_orders %}
+
+        <tr>
+          <td>{{ order.id }}</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-link align-middle" data-bs-toggle="modal" data-bs-target="#exampleModal{{ order.customer.first_name }}">
+              {{ order.customer.first_name }}
+            </button>
+            <!-- Modal -->
+            <div class="modal fade" id="exampleModal{{ order.customer.first_name }}" tabindex="-1" aria-labelledby="exampleModalLabel"
+              aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Customer details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body text-start">
+                    <p>Name: <b>{{ order.customer.first_name }}</b></p>
+                    <p>Contact: <b>{{ order.customer.phone_number }}</b></p>
+                    <p>Address: <b>{{ order.address }}</b></p>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </td>
+          
+          <td class="text-center">
+            <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#exampleModal{{ order.id }}">
+              Products
+            </button>
+            <!-- Modal -->
+            <div class="modal fade" id="exampleModal{{ order.id }}" tabindex="-1" aria-labelledby="exampleModalLabel"
+              aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Order Products</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body text-start">
+                    <p style="font-weight: bold;">{{ order.items|linebreaksbr }}</p>
+                    <p>Total: <b>{{ order.sum|intcomma }} UZS</b></p>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </td>
+
+          <td class="text-center">{{ order.payment_method }}</td>
+          <td class="align-middle text-center">
+            <form action="{% url 'change_status' order.id %}" method="post">
+              {% csrf_token %}
+              <button class="btn btn-sm btn-primary mb-1" name="status" value="in progress">Progress</button>
+              <button class="btn btn-sm btn-danger mb-1" name="status" value="cancelled">Cancel</button>
+            </form>
+          </td>
+        </tr>
+
+        {% endfor %}
+      </tbody>
+      <caption>List of <b>Pending</b> Orders</caption>
+    </table>
+  </div>
+
+  <!-- 2nd Table -->
+  <div class="col-3">
     <table class="table table-striped table-hover table-bordered table align-middle table table-sm">
       <h1>In Progress</h1>
       <thead class="table-dark">
         <tr class="align-middle text-center">
           <th scope="col">#</th>
-          <th scope="col">Order by</th>
-          <th scope="col">Order products</th>
-          <th scope="col">Payment method</th>
-          <th scope="col">Total sum</th>
-          <th scope="col">Order status</th>
-          <th scope="col">Order Address</th>
-          <th scope="col">Change Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for order in orders %}
-        {% if order.order_status == 'In progress' %}
-
-        <tr>
-          <td>{{ order.id }}</td>
-          <td class="text-center">{{ order.customer.first_name }}</td>
-          <td class="text-center">
-            <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-              Products
-            </button>
-            <!-- Modal -->
-            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
-              aria-hidden="true">
-              <div class="modal-dialog">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Order Products</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                  </div>
-                  <div class="modal-body text-start">
-                    <p style="font-weight: bold;">{{ order.order_items|linebreaksbr }}</p>
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </td>
-
-          <td class="text-center">{{ order.payment_method }}</td>
-          <td class="text-center">{{ order.order_sum }} UZS</td>
-          <td class="text-center">{{ order.order_status }}</td>
-          <td>{{ order.order_address }}</td>
-          <td class="align-middle text-center">
-            <form action="{% url 'status' order.id %}" method="post">
-              {% csrf_token %}
-              <button class="btn btn-sm btn-primary mb-1" name="status" value="delivery">Delivery</button>
-              <button class="btn btn-sm btn-danger" name="status" value="cancel">Cancel</button>
-            </form>
-          </td>
-        </tr>
-        {% endif %}
-        {% endfor %}
-      </tbody>
-      <caption>List of Orders</caption>
-    </table>
-  </div>
-
-
-  <div class="col-6">
-    <table class="table table-striped table-hover table-bordered table align-middle table table-sm">
-      <h1>On Delivery</h1>
-      <thead class="table-dark">
-        <tr class="align-middle text-center">
-          <th scope="col">#</th>
-          <th scope="col">Order by</th>
-          <th scope="col">Order products</th>
-          <th scope="col">Payment method</th>
-          <th scope="col">Total sum</th>
-          <th scope="col">Order status</th>
-          <th scope="col">Order comment</th>
+          <th scope="col">By</th>
+          <th scope="col">Products</th>
           <th scope="col">Change status</th>
         </tr>
       </thead>
       <tbody>
-        {% for order in orders %}
-        {% if order.order_status == 'Delivery' %}
+        {% for order in in_progress_orders %}
         <tr>
 
           <td>{{ order.id }}</td>
           <td class="text-center">{{ order.customer.first_name }}</td>
           <td class="text-center">
-            <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#exampleModal{{ order.id }}">
               Products
             </button>
             <!-- Modal -->
-            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+            <div class="modal fade" id="exampleModal{{ order.id }}" tabindex="-1" aria-labelledby="exampleModalLabel"
               aria-hidden="true">
               <div class="modal-dialog">
                 <div class="modal-content">
@@ -113,7 +126,92 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                   <div class="modal-body text-start">
-                    <p style="font-weight: bold;">{{ order.order_items|linebreaksbr }}</p>
+                    <p style="font-weight: bold;">{{ order.items|linebreaksbr }}</p>
+                    <p>Total: <b>{{ order.sum|intcomma }} UZS</b></p>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </td>
+
+          <td class="align-middle text-center">
+            <form action="{% url 'change_status' order.id %}" method="post">
+              {% csrf_token %}
+              <button class="btn btn-sm btn-outline-success" name="status" value="on delivery">Delivery</button>
+              <button class="btn btn-sm btn-danger" name="status" value="cancelled">Cancel</button>
+            </form>
+          </td>
+
+        </tr>
+        {% endfor %}
+      </tbody>
+      <caption>List of <b>In Progress</b> Orders</caption>
+    </table>
+  </div>
+
+  <!-- 3rd Table -->
+  <div class="col-4">
+    <table class="table table-striped table-hover table-bordered table align-middle table table-sm">
+      <h1>On Delivery</h1>
+      <thead class="table-warning">
+        <tr class="align-middle text-center">
+          <th scope="col">#</th>
+          <th scope="col">Customer</th>
+          <th scope="col">Products</th>
+          <th scope="col">Payment method</th>
+          <th scope="col">Address</th>
+          <th scope="col">Change Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in on_delivery_orders %}
+
+        <tr>
+          <td>{{ order.id }}</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-link align-middle" data-bs-toggle="modal" data-bs-target="#exampleModal{{ order.customer.first_name }}">
+              {{ order.customer.first_name }}
+            </button>
+            <!-- Modal -->
+            <div class="modal fade" id="exampleModal{{ order.customer.first_name }}" tabindex="-1" aria-labelledby="exampleModalLabel"
+              aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Customer details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body text-start">
+                    <p>Name: <b>{{ order.customer.first_name }} </b></p>
+                    <p>Contact: <b>{{ order.customer.phone_number }}</b></p>
+                    <p>Address: <b>{{ order.address }}</b></p>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </td>
+          <td class="text-center">
+            <button type="button" class="btn btn-dark align-middle" data-bs-toggle="modal" data-bs-target="#exampleModal{{ order.id }}">
+              Products
+            </button>
+            <!-- Modal -->
+            <div class="modal fade" id="exampleModal{{ order.id }}" tabindex="-1" aria-labelledby="exampleModalLabel"
+              aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Order Products</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body text-start">
+                    <p style="font-weight: bold;">{{ order.items|linebreaksbr }}</p>
+                    <p>Total: <b>{{ order.sum|intcomma }} UZS</b></p>
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -123,27 +221,21 @@
             </div>
           </td>
           <td class="text-center">{{ order.payment_method }}</td>
-          <td class="text-center">{{ order.order_sum }}</td>
-
-          <td class="text-center">{{ order.order_status }}</td>
-          <td class="text-center">{{ order.order_comment }}</td>
+          <td class="text-center">{{ order.address }}</td>
           <td class="align-middle text-center">
-            <form action="{% url 'status' order.id %}" method="post">
+            <form action="{% url 'change_status' order.id %}" method="post">
               {% csrf_token %}
-              <button class="btn btn-sm btn-outline-success" name="status" value="finished">Finished</button>
-              <button class="btn btn-sm btn-danger" name="status" value="cancel">Cancel</button>
+              <button class="btn btn-success mb-1 btn-sm" name="status" value="finished">Finish</button>
+              <button class="btn btn-danger mb-1 btn-sm" name="status" value="cancelled">Cancel</button>
             </form>
           </td>
-
         </tr>
-        {% endif %}
+
         {% endfor %}
       </tbody>
-      <caption>List of Orders</caption>
+      <caption>List of <b>On Delivery</b> Orders</caption>
     </table>
   </div>
-
-
 
 </div>
 

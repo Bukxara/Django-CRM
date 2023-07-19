@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% load humanize %}
+
+{% block content %}
+
+{% if user.is_authenticated %}
+
+{% if customer_orders %}
+
+<div class="col-10 p-4">
+    <table class="table table-striped-columns table-hover table-bordered table-light align-middle">
+      <h1>{{ customer_orders.0.customer.first_name }}'s orders</h1>
+      <thead class="table-danger">
+        <tr class="align-middle text-center">
+          <th scope="col">#</th>
+          <th scope="col">Products</th>
+          <th scope="col">Payment method</th>
+          <th scope="col">Address</th>
+          <th scope="col">Date</th>
+          <th scope="col">Status</th>
+          <th scope="col">Total</th>
+        </tr>
+      </thead>
+      <tbody class="table-group-divider">
+        {% for order in customer_orders %}
+
+        <tr>
+          <td class="align-middle text-center">{{ order.id }}</td>
+
+          <td class="text-center">
+            <button type="button" class="btn btn-dark align-middle" data-bs-toggle="modal" data-bs-target="#exampleModal{{ order.id }}">
+              Products
+            </button>
+            <!-- Modal -->
+            <div class="modal fade" id="exampleModal{{ order.id }}" tabindex="-1" aria-labelledby="exampleModalLabel"
+              aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel"; style="color:rgb(20, 31, 99)">Order Products</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body text-start">
+                    <p style="font-weight: bold;">{{ order.items|linebreaksbr }}</p>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </td>
+
+          <td class="text-center">{{ order.payment_method }}</td>
+          <td class="align-middle text-center">{{ order.address }}</td>
+          <td class="align-middle text-center">{{ order.created_at }}</td>
+          <td class="align-middle text-center">{{ order.status }}</td>
+          <td class="align-middle text-center">{{ order.sum|intcomma }} UZS</td>
+        </tr>
+
+        {% endfor %}
+      </tbody>
+      <caption style="background-color: rgb(40, 40, 40); color:rgb(222, 216, 216)" class="h3 text-end p-2">Total Revenue:
+        {{ total_revenue|intcomma }} UZS
+      </caption>
+    </table>
+  </div>
+  
+{% else %}
+  <h1 class="text-center" style="color:rgb(18, 7, 82)">There are no orders by this customer yet!</h1>
+{% endif %}
+
+{% else %}
+  <h1 class="text-center" style="color:red">You are not admin!</h1>
+
+{% endif %}
+  
+{% endblock %}
+
