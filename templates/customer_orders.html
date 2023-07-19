@@ -62,7 +62,7 @@
         {% endfor %}
       </tbody>
       <caption style="background-color: rgb(40, 40, 40); color:rgb(222, 216, 216)" class="h3 text-end p-2">Total Revenue:
-        {{ total_revenue|intcomma }} UZS
+        {{ total_revenue|default_if_none:0|intcomma }} UZS
       </caption>
     </table>
   </div>
