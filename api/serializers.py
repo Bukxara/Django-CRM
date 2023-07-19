@@ -47,7 +47,7 @@ class OrderSerializers(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ('id', 'customer', 'order_items', 'payment_method', 'order_address', 'order_comment', 'order_sum', 'order_status')
+        fields = ('id', 'customer', 'items', 'payment_method', 'address', 'comment', 'sum', 'status')
 
 
 class CommentSerializers(serializers.ModelSerializer):
