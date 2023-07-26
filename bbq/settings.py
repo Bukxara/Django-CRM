@@ -12,9 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
-from .config import SECRET_KEY as secret
-from .config import ALLOWED_HOSTS as allowed_hosts
-from .config import PGNAME, USER, POSTGRES_PASSWORD, PGHOST, PGPORT
+from . import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -24,12 +22,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = secret
+SECRET_KEY = config.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = allowed_hosts
+ALLOWED_HOSTS = config.ALLOWED_HOSTS
 
 
 # Application definition
@@ -85,11 +83,11 @@ WSGI_APPLICATION = 'bbq.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': PGNAME,
-        'USER': USER,
-        'PASSWORD': POSTGRES_PASSWORD,
-        'HOST': PGHOST,
-        'PORT': PGPORT,
+        'NAME': config.PGNAME,
+        'USER': config.USER,
+        'PASSWORD': config.POSTGRES_PASSWORD,
+        'HOST': config.PGHOST,
+        'PORT': config.PGPORT,
     }
 }
 

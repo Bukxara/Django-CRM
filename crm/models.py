@@ -6,16 +6,29 @@ from django.utils.translation import gettext_lazy as _
 
 # Create your models here.
 
-class Customer(AbstractBaseUser):
+class AbstractBaseModel(models.Model):
+    # Abstract Class for other models
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
+
+class Customer(AbstractBaseModel, AbstractBaseUser):
     # Customer model for Users that inherits from AbstractBaseUser
 
     telegram_id = models.CharField(max_length=20, unique=True)
     first_name = models.CharField(max_length=50)
     username = models.CharField(max_length=50, unique=True, blank=True)
     phone_number = models.CharField(max_length=30, blank=True)
-    birthday = models.DateField(null=True)
+    birthday = models.DateField(blank=True, null=True)
     registered_at = models.DateTimeField(auto_now_add=True)
     password = None
+    last_login = None
+
+    USERNAME_FIELD = 'telegram_id'
 
     def number_of_orders(self):
         # Displays number of orders initiated by a customer
@@ -35,7 +48,16 @@ class Customer(AbstractBaseUser):
         return self.first_name
 
 
-class Category(models.Model):
+class AbstractCustomerModel(models.Model):
+    # Abstract Class defining author (customer)
+
+    customer = models.ForeignKey(Customer, to_field='telegram_id', on_delete=models.CASCADE)
+
+    class Meta:
+        abstract = True
+
+
+class Category(AbstractBaseModel):
 
     category_name = models.CharField(max_length=50, unique=True)
     category_image = models.ImageField(upload_to="images/", blank=True)
@@ -48,7 +70,7 @@ class Category(models.Model):
         ordering = ['id']
 
 
-class Product(models.Model):
+class Product(AbstractBaseModel):
     # Model for all the available products
 
     Drinks = (('Sprite', 'Sprite'), ('Coca-Cola', 'Coca-Cola'), ('Fanta', 'Fanta'))
@@ -77,16 +99,15 @@ class Product(models.Model):
         ordering = ["id"]
     
 
-class Cart(models.Model):
+class Cart(AbstractCustomerModel):
     # Model for storing different customers' carts (of products)
 
-    customer = models.ForeignKey(Customer, to_field='telegram_id', on_delete=models.CASCADE)
     product_id = models.ForeignKey(Product, on_delete=models.CASCADE)
     product_quantity = models.IntegerField()
     product_options = models.JSONField(max_length=200, null=True)
 
 
-class Order(models.Model):
+class Order(AbstractBaseModel, AbstractCustomerModel):
     # Model for orders initiated by customers
 
     statuses = (("Pending", "Pending"), ("In Progress", "In Progress"), ("On Delivery", "On Delivery"),
@@ -94,7 +115,6 @@ class Order(models.Model):
     
     payment_methods = (("Click", "Click"), ("Payme", "Payme"), ("Cash", "Cash"))
 
-    customer = models.ForeignKey(Customer, to_field='telegram_id', on_delete=models.SET_NULL, null=True)
     items = models.TextField()
     payment_method = models.CharField(choices=payment_methods, max_length=5)
     address = models.CharField(max_length=250, null=True, blank=True)
@@ -103,7 +123,6 @@ class Order(models.Model):
     status = models.CharField(choices=statuses, default="Pending", max_length=12)
     is_paid = models.BooleanField(_("Paid"), default=False)
     is_refunded = models.BooleanField(_("Refunded"), default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.customer}'s order"
@@ -130,19 +149,16 @@ class Order(models.Model):
         self.save()
     
 
-class Comment(models.Model):
+class Comment(AbstractBaseModel, AbstractCustomerModel):
 
-    customer = models.ForeignKey(Customer, to_field='telegram_id', on_delete=models.SET_NULL, null=True)
-    created_at = models.DateTimeField(_("Createad At"), auto_now_add=True)
     comment = models.TextField()
 
     def __str__(self):
         return f"{self.customer}'s comment"
     
 
-class CustomerAddress(models.Model):
+class CustomerAddress(AbstractCustomerModel):
 
-    customer = models.ForeignKey(Customer, to_field='telegram_id', on_delete=models.SET_NULL, null=True)
     address_coordinates = models.JSONField(max_length=200, null=True, blank=True)
     address_text = models.CharField(max_length=250, null=True, blank=True)
     
