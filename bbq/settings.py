@@ -33,6 +33,7 @@ ALLOWED_HOSTS = config.ALLOWED_HOSTS
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -147,5 +148,30 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+JAZZMIN_SETTINGS = {
+    'site_title': 'BBQ',
+    'site_header': 'BBQ',
+    'welcome_sign': 'Welcome to BBQ administration',
+    'copyright': 'BBQ',
+    'order_with_respect_to': ['auth', 'authtoken', 'crm', 'crm.customer', 'crm.category', 'crm.product', 'crm.order', 'crm.comment'],
+    'custom_links': {
+        'auth': [{
+            'name': 'Start Chat',
+            'url': 'start_chat',
+            'icon': 'fas fa-comments'
+        }]
+    },
+    'icons': {
+        'auth': 'fas fa-users-cog',
+        'auth.user': 'fas fa-user',
+        'auth.Group': 'fas fa-users',
+        'crm.customer': 'far fa-user-circle',
+        'crm.category': 'fas fa-layer-group',
+        'crm.product': 'fas fa-hamburger',
+        'crm.order': 'fas fa-car',
+        'crm.comment': 'far fa-comment-alt',
+        'authtoken.tokenproxy': 'fas fa-key',
+    },
 
+}
 

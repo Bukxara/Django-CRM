@@ -30,3 +30,4 @@ urlpatterns = [
     path('filter/address/<str:tg_id>/', CustomerAddressView.as_view()), # Getting customer's addresses
     
 ]
+

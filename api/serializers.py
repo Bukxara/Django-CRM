@@ -20,7 +20,7 @@ class CategorySerializers(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = ('category_name',)
+        fields = ('category_name', 'category_image')
 
 
 class ProductSerializers(serializers.ModelSerializer):
