@@ -101,7 +101,8 @@ class ProductsByCategoryName(APIView):
     # Filtering products by its category name
 
     def get(self, request, name):
-        products = Product.objects.filter(category_name=name)
+        category = Category.objects.get(category_name=name)
+        products = Product.objects.filter(category=category)
         serializer = ProductSerializers(products, many=True)
         return Response(serializer.data)
 

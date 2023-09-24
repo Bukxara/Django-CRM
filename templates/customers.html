@@ -14,11 +14,11 @@
             <thead class="table-dark">
                 <tr>
                     <th scope="col">#</th>
-                    <th scope="col">Name</th>
-                    <th scope="col">Phone Number</th>
-                    <th scope="col">Registered at</th>
-                    <th scope="col">Last Order</th>
-                    <th scope="col">Number of orders</th>
+                    <th scope="col">Ismi</th>
+                    <th scope="col">Telefon raqami</th>
+                    <th scope="col">Ro'yxatdan o'tgan</th>
+                    <th scope="col">Oxirgi buyurtmasi</th>
+                    <th scope="col">Buyurtmalar soni</th>
                 </tr>
             </thead>
             <tbody>
@@ -30,7 +30,7 @@
                     <td>{{ customer.registered_at }}</td>
                     <td class="text-center">
                         <button type="button" class="btn btn-secondary align-middle" data-bs-toggle="modal" data-bs-target="#exampleModal{{ customer.id }}">
-                          Click to see
+                          Ko'rish
                         </button>
                         <!-- Modal -->
                         <div class="modal fade" id="exampleModal{{ customer.id }}" tabindex="-1" aria-labelledby="exampleModalLabel"
@@ -42,10 +42,10 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                               </div>
                               <div class="modal-body text-start">
-                                <p>Items: <b>{{ customer.last_order.items|linebreaksbr }}</b></p>
-                                <p>Payment Method: <b>{{ customer.last_order.payment_method }}</b></p>
-                                <p>Address: <b>{{ customer.last_order.address }}</b></p>
-                                <p>Total: <b>{{ customer.last_order.sum|intcomma }} UZS</b></p>
+                                <p>Mahsulotlar: <b>{{ customer.last_order.items|linebreaksbr }}</b></p>
+                                <p>To'lov turi: <b>{{ customer.last_order.payment_method }}</b></p>
+                                <p>Manzil: <b>{{ customer.last_order.address }}</b></p>
+                                <p>Jami: <b>{{ customer.last_order.sum|intcomma }} UZS</b></p>
                               </div>
                               <div class="modal-footer">
                                 <p>Status: <b>{{ customer.last_order.status }}</b></p>

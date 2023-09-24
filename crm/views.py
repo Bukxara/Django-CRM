@@ -6,7 +6,6 @@ from django.db.models import Sum
 
 # Create your views here.
 
-
 def home(request):
     # Check to see if logging in
 
@@ -37,9 +36,9 @@ def logout_user(request):
 def dashboard(request):
     # See what's going on on the dashboard
 
-    pending_orders = Order.objects.filter(status="Pending")
-    in_progress_orders = Order.objects.filter(status="In Progress")
-    on_delivery_orders = Order.objects.filter(status="On Delivery")
+    pending_orders = Order.objects.filter(status="Kutmoqda")
+    in_progress_orders = Order.objects.filter(status="Pishirilmoqda")
+    on_delivery_orders = Order.objects.filter(status="Yetkazilmoqda")
     orders = Order.objects.all()
     return render(request, "dashboard.html", {"orders": orders, "pending_orders": pending_orders, 
                         "in_progress_orders": in_progress_orders, "on_delivery_orders": on_delivery_orders})
@@ -67,7 +66,7 @@ def change_status(request, pk):
         order = Order.objects.get(id=pk)
         if request.method == "POST":
             data = request.POST
-            new_status = data.get("status").title()
+            new_status = data.get("status").capitalize()
             print(new_status)
             order.change_status(new_status)
         return redirect("dashboard")

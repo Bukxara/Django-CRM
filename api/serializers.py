@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from crm.models import Customer, Category, Product, Cart, Order, Comment, CustomerAddress
+from crm.models import Customer, Category, Product, Cart, Order, Comment, CustomerAddress, ProductOptionPrice
 
 
 class CustomerSerializers(serializers.ModelSerializer):
@@ -20,14 +20,30 @@ class CategorySerializers(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = ('category_name', 'category_image')
+        fields = ('id', 'category_name', 'category_image')
+
+
+class ProductOptionPriceSerializers(serializers.ModelSerializer):
+    option_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ProductOptionPrice
+        fields = ('product', 'option_name', 'option_price')
+    
+    def get_option_name(self, instance):
+        return instance.option.name
 
 
 class ProductSerializers(serializers.ModelSerializer):
+    product_options = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
-        fields = ('id', 'product_name', 'product_price', 'product_description', 'product_image', 'Drinks', 'Snacks', 'Kids')
+        fields = ('id', 'product_name', 'product_price', 'product_description', 'product_image', 'has_different_options', 'product_options')
+    
+    def get_product_options(self, instance):
+        product_options = instance.productoptionprice_set.all()
+        return ProductOptionPriceSerializers(product_options, many=True).data
 
 
 class CartSerializers(serializers.ModelSerializer):

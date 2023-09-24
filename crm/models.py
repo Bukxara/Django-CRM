@@ -43,7 +43,7 @@ class Customer(AbstractBaseModel, AbstractBaseUser):
 
         last_order = Order.objects.filter(customer=self.telegram_id).last()
         return last_order
-    
+
     def __str__(self):
         return self.first_name
 
@@ -51,7 +51,8 @@ class Customer(AbstractBaseModel, AbstractBaseUser):
 class AbstractCustomerModel(models.Model):
     # Abstract Class defining author (customer)
 
-    customer = models.ForeignKey(Customer, to_field='telegram_id', on_delete=models.CASCADE)
+    customer = models.ForeignKey(
+        Customer, to_field='telegram_id', on_delete=models.CASCADE)
 
     class Meta:
         abstract = True
@@ -64,7 +65,7 @@ class Category(AbstractBaseModel):
 
     def __str__(self):
         return self.category_name
-    
+
     class Meta:
         verbose_name_plural = 'categories'
         ordering = ['id']
@@ -73,32 +74,43 @@ class Category(AbstractBaseModel):
 class Product(AbstractBaseModel):
     # Model for all the available products
 
-    Drinks = (('Sprite', 'Sprite'), ('Coca-Cola', 'Coca-Cola'), ('Fanta', 'Fanta'))
-    Snacks = (('Potato Balls', 'Potato Balls'), ('French Fries', 'French Fries'), ('Country Style Potato', 'Country Style Potato'))
-    kids = (('Мальчик', 'Мальчик'), ('Девочка', 'Девочка'))
-
-    category_id = models.ForeignKey(
+    category = models.ForeignKey(
         Category, on_delete=models.SET_NULL, null=True)
-    category_name = models.ForeignKey(
-        Category, to_field="category_name", on_delete=models.SET_NULL, null=True, related_name="category")
+
     product_name = models.CharField(max_length=50)
-    product_price = models.IntegerField()
+    product_price = models.IntegerField(blank=True, null=True)
     product_description = models.CharField(max_length=500, blank=True)
     product_image = models.ImageField(upload_to="images/")
-    Drinks = models.CharField(max_length=9, choices=Drinks, blank=True, null=True)
-    Snacks = models.CharField(max_length=20, choices=Snacks, blank=True, null=True)
-    Kids = models.CharField(max_length=7, choices=kids, blank=True, null=True)
+    has_different_options = models.BooleanField(default=False)
 
     def __str__(self):
         return self.product_name
 
     def get_absolute_url(self):
         return reverse("bbq", args=[str(self.id)])
-    
+
     class Meta:
         ordering = ["id"]
-    
+        
 
+class ProductOption(AbstractBaseModel):
+
+    name = models.CharField(max_length=255, help_text='Mahsulotga tegishli bo\'lgan qo\'shimcha opsiya nomi')
+
+    def __str__(self):
+        return self.name
+
+
+class ProductOptionPrice(models.Model):
+
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    option = models.ForeignKey(ProductOption, on_delete=models.CASCADE)
+    option_price = models.IntegerField()
+
+    def __str__(self):
+        return f"{self.product}'s option"
+    
+    
 class Cart(AbstractCustomerModel):
     # Model for storing different customers' carts (of products)
 
@@ -110,44 +122,45 @@ class Cart(AbstractCustomerModel):
 class Order(AbstractBaseModel, AbstractCustomerModel):
     # Model for orders initiated by customers
 
-    statuses = (("Pending", "Pending"), ("In Progress", "In Progress"), ("On Delivery", "On Delivery"),
-                ("Finished", "Finished"), ("Cancelled", "Cancelled"))
-    
-    payment_methods = (("Click", "Click"), ("Payme", "Payme"), ("Cash", "Cash"))
+    statuses = (("Kutmoqda", "Kutmoqda"), ("Pishirilmoqda", "Pishirilmoqda"), ("Yetkazilmoqda", "Yetkazilmoqda"),
+                ("Yetkazilgan", "Yetkazilgan"), ("Bekor qilingan", "Bekor qilingan"))
+
+    payment_methods = (("Karta", "Karta"), ("Naqd", "Naqd"))
 
     items = models.TextField()
     payment_method = models.CharField(choices=payment_methods, max_length=5)
-    address = models.CharField(max_length=250, null=True, blank=True)
+    address = models.CharField(max_length=255, null=True, blank=True)
     comment = models.CharField(max_length=500, null=True, blank=True)
     sum = models.IntegerField()
-    status = models.CharField(choices=statuses, default="Pending", max_length=12)
+    status = models.CharField(
+        choices=statuses, default="Pending", max_length=14)
     is_paid = models.BooleanField(_("Paid"), default=False)
     is_refunded = models.BooleanField(_("Refunded"), default=False)
 
     def __str__(self):
-        return f"{self.customer}'s order"
+        return f"{self.customer}ning buyurtmasi"
 
     @property
     def is_paid_online(self):
         # Whether order is paid online or not
-        return self.payment_method in ("Payme", "Click")
-    
+        return self.payment_method in ("Karta")
+
     def change_status(self, new_status):
         # Changes the status of the order
 
         if new_status not in (status[0] for status in self.statuses):
-            raise ValueError("Such status does not exist")
+            raise ValueError("Bunday status mavjud emas!")
         if self.is_paid_online:
-            if new_status == "In Progress":
+            if new_status == "Pishirilmoqda":
                 self.is_paid = True
-            elif self.status in ("In Progress", "On Delivery") and new_status == "Cancelled":
+            elif self.status in ("Pishirilmoqda", "Yetkazilmoqda") and new_status == "Bekor qilingan":
                 self.is_refunded = True
         else:
-            if new_status == "Finished":
+            if new_status == "Yetkazilgan":
                 self.is_paid = True
-        self.status = new_status      
+        self.status = new_status
         self.save()
-    
+
 
 class Comment(AbstractBaseModel, AbstractCustomerModel):
 
@@ -155,22 +168,26 @@ class Comment(AbstractBaseModel, AbstractCustomerModel):
 
     def __str__(self):
         return f"{self.customer}'s comment"
-    
+
 
 class CustomerAddress(AbstractCustomerModel):
 
-    address_coordinates = models.JSONField(max_length=200, null=True, blank=True)
-    address_text = models.CharField(max_length=250, null=True, blank=True)
-    
+    address_coordinates = models.JSONField(
+        max_length=255, null=True, blank=True)
+    address_text = models.CharField(max_length=255, null=True, blank=True)
+
     def save(self, *args, **kwargs):
         addresses = CustomerAddress.objects.all().filter(customer=self.customer)
         if len(addresses) == 5:
-            first_address = CustomerAddress.objects.all().filter(customer=self.customer).first()
+            first_address = CustomerAddress.objects.all().filter(
+                customer=self.customer).first()
             first_address.delete()
         super(CustomerAddress, self).save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.customer}'s addresses"
-    
+        return f"{self.customer}ning adreslari"
+
     class Meta:
         verbose_name_plural = "customer addresses"
+
+

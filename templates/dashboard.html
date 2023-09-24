@@ -12,14 +12,14 @@
   <!-- 1st table -->
   <div class="col-4">
     <table class="table table-striped table-hover table-bordered table align-middle table table-sm">
-      <h1>Pending</h1>
+      <h1>Kutmoqda</h1>
       <thead class="table-dark">
         <tr class="align-middle text-center">
           <th scope="col">#</th>
-          <th scope="col">Customer</th>
-          <th scope="col">Products</th>
-          <th scope="col">Payment method</th>
-          <th scope="col">Change status</th>
+          <th scope="col">Xaridor</th>
+          <th scope="col">Mahsulotlar</th>
+          <th scope="col">To'lov turi</th>
+          <th scope="col">Statusni o'zgartirish</th>
         </tr>
       </thead>
       <tbody>
@@ -37,16 +37,16 @@
               <div class="modal-dialog">
                 <div class="modal-content">
                   <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Customer details</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Xaridor haqida</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                   <div class="modal-body text-start">
-                    <p>Name: <b>{{ order.customer.first_name }}</b></p>
-                    <p>Contact: <b>{{ order.customer.phone_number }}</b></p>
-                    <p>Address: <b>{{ order.address }}</b></p>
+                    <p>Ismi: <b>{{ order.customer.first_name }}</b></p>
+                    <p>Aloqa: <b>{{ order.customer.phone_number }}</b></p>
+                    <p>Manzil: <b>{{ order.address }}</b></p>
                   </div>
                   <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Yopish</button>
                   </div>
                 </div>
               </div>
@@ -55,7 +55,7 @@
           
           <td class="text-center">
             <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#exampleModal{{ order.id }}">
-              Products
+              Mahsulotlar
             </button>
             <!-- Modal -->
             <div class="modal fade" id="exampleModal{{ order.id }}" tabindex="-1" aria-labelledby="exampleModalLabel"
@@ -63,15 +63,15 @@
               <div class="modal-dialog">
                 <div class="modal-content">
                   <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Order Products</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Buyurtma Mahsulotlari</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                   <div class="modal-body text-start">
                     <p style="font-weight: bold;">{{ order.items|linebreaksbr }}</p>
-                    <p>Total: <b>{{ order.sum|intcomma }} UZS</b></p>
+                    <p>Jami: <b>{{ order.sum|intcomma }} UZS</b></p>
                   </div>
                   <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Yopish</button>
                   </div>
                 </div>
               </div>
@@ -82,28 +82,28 @@
           <td class="align-middle text-center">
             <form action="{% url 'change_status' order.id %}" method="post">
               {% csrf_token %}
-              <button class="btn btn-sm btn-primary mb-1" name="status" value="in progress">Progress</button>
-              <button class="btn btn-sm btn-danger mb-1" name="status" value="cancelled">Cancel</button>
+              <button class="btn btn-sm btn-primary mb-1" name="status" value="pishirilmoqda">Pishirish</button>
+              <button class="btn btn-sm btn-danger mb-1" name="status" value="bekor qilingan">Bekor qilish</button>
             </form>
           </td>
         </tr>
 
         {% endfor %}
       </tbody>
-      <caption>List of <b>Pending</b> Orders</caption>
+      <caption><b>Kutayotgan</b> buyurtmalar ro'yxati</caption>
     </table>
   </div>
 
   <!-- 2nd Table -->
   <div class="col-3">
     <table class="table table-striped table-hover table-bordered table align-middle table table-sm">
-      <h1>In Progress</h1>
+      <h1>Pishirilmoqda</h1>
       <thead class="table-dark">
         <tr class="align-middle text-center">
           <th scope="col">#</th>
-          <th scope="col">By</th>
-          <th scope="col">Products</th>
-          <th scope="col">Change status</th>
+          <th scope="col">Xaridor</th>
+          <th scope="col">Mahsulotlar</th>
+          <th scope="col">Status o'zgartirish</th>
         </tr>
       </thead>
       <tbody>
@@ -114,7 +114,7 @@
           <td class="text-center">{{ order.customer.first_name }}</td>
           <td class="text-center">
             <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#exampleModal{{ order.id }}">
-              Products
+              Mahsulotlar
             </button>
             <!-- Modal -->
             <div class="modal fade" id="exampleModal{{ order.id }}" tabindex="-1" aria-labelledby="exampleModalLabel"
@@ -122,15 +122,15 @@
               <div class="modal-dialog">
                 <div class="modal-content">
                   <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Order Products</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Buyurtma Mahsulotlari</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                   <div class="modal-body text-start">
                     <p style="font-weight: bold;">{{ order.items|linebreaksbr }}</p>
-                    <p>Total: <b>{{ order.sum|intcomma }} UZS</b></p>
+                    <p>Jami: <b>{{ order.sum|intcomma }} UZS</b></p>
                   </div>
                   <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Yopish</button>
                   </div>
                 </div>
               </div>
@@ -140,30 +140,30 @@
           <td class="align-middle text-center">
             <form action="{% url 'change_status' order.id %}" method="post">
               {% csrf_token %}
-              <button class="btn btn-sm btn-outline-success" name="status" value="on delivery">Delivery</button>
-              <button class="btn btn-sm btn-danger" name="status" value="cancelled">Cancel</button>
+              <button class="btn btn-sm btn-outline-success" name="status" value="yetkazilmoqda">Yetkazish</button>
+              <button class="btn btn-sm btn-danger" name="status" value="bekor qilingan">Bekor qilish</button>
             </form>
           </td>
 
         </tr>
         {% endfor %}
       </tbody>
-      <caption>List of <b>In Progress</b> Orders</caption>
+      <caption><b>Pishirilayotgan</b> buyurtmalar ro'yxati</caption>
     </table>
   </div>
 
   <!-- 3rd Table -->
   <div class="col-4">
     <table class="table table-striped table-hover table-bordered table align-middle table table-sm">
-      <h1>On Delivery</h1>
+      <h1>Yetkazilmoqda</h1>
       <thead class="table-warning">
         <tr class="align-middle text-center">
           <th scope="col">#</th>
-          <th scope="col">Customer</th>
-          <th scope="col">Products</th>
-          <th scope="col">Payment method</th>
-          <th scope="col">Address</th>
-          <th scope="col">Change Status</th>
+          <th scope="col">Xaridor</th>
+          <th scope="col">Mahsulotlar</th>
+          <th scope="col">To'lov turi</th>
+          <th scope="col">Manzil</th>
+          <th scope="col">Status o'zgartirish</th>
         </tr>
       </thead>
       <tbody>
@@ -181,16 +181,16 @@
               <div class="modal-dialog">
                 <div class="modal-content">
                   <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Customer details</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Xaridor haqida</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                   <div class="modal-body text-start">
-                    <p>Name: <b>{{ order.customer.first_name }} </b></p>
-                    <p>Contact: <b>{{ order.customer.phone_number }}</b></p>
-                    <p>Address: <b>{{ order.address }}</b></p>
+                    <p>Ismi: <b>{{ order.customer.first_name }} </b></p>
+                    <p>Aloqa: <b>{{ order.customer.phone_number }}</b></p>
+                    <p>Manzil: <b>{{ order.address }}</b></p>
                   </div>
                   <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Yopish</button>
                   </div>
                 </div>
               </div>
@@ -198,7 +198,7 @@
           </td>
           <td class="text-center">
             <button type="button" class="btn btn-dark align-middle" data-bs-toggle="modal" data-bs-target="#exampleModal{{ order.id }}">
-              Products
+              Mahsulotlar
             </button>
             <!-- Modal -->
             <div class="modal fade" id="exampleModal{{ order.id }}" tabindex="-1" aria-labelledby="exampleModalLabel"
@@ -206,15 +206,15 @@
               <div class="modal-dialog">
                 <div class="modal-content">
                   <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Order Products</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Buyurtma Mahsulotlari</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                   <div class="modal-body text-start">
                     <p style="font-weight: bold;">{{ order.items|linebreaksbr }}</p>
-                    <p>Total: <b>{{ order.sum|intcomma }} UZS</b></p>
+                    <p>Jami: <b>{{ order.sum|intcomma }} UZS</b></p>
                   </div>
                   <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Yopish</button>
                   </div>
                 </div>
               </div>
@@ -225,15 +225,15 @@
           <td class="align-middle text-center">
             <form action="{% url 'change_status' order.id %}" method="post">
               {% csrf_token %}
-              <button class="btn btn-success mb-1 btn-sm" name="status" value="finished">Finish</button>
-              <button class="btn btn-danger mb-1 btn-sm" name="status" value="cancelled">Cancel</button>
+              <button class="btn btn-success mb-1 btn-sm" name="status" value="yetkazilgan">Yetkazildi</button>
+              <button class="btn btn-danger mb-1 btn-sm" name="status" value="bekor qilingan">Bekor qilish</button>
             </form>
           </td>
         </tr>
 
         {% endfor %}
       </tbody>
-      <caption>List of <b>On Delivery</b> Orders</caption>
+      <caption><b>Yetkazilayotgan</b> buyrutmalar ro'yxati</caption>
     </table>
   </div>
 
@@ -243,7 +243,7 @@
 {% endif %}
 
 {% else %}
-<h1 class="text-center" style="color:red">You are not admin!</h1>
+<h1 class="text-center" style="color:red">Siz admin emassiz!</h1>
 
 {% endif %}
 

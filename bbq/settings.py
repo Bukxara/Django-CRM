@@ -25,10 +25,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = config.ALLOWED_HOSTS
-
 
 # Application definition
 
@@ -153,14 +152,9 @@ JAZZMIN_SETTINGS = {
     'site_header': 'BBQ',
     'welcome_sign': 'Welcome to BBQ administration',
     'copyright': 'BBQ',
-    'order_with_respect_to': ['auth', 'authtoken', 'crm', 'crm.customer', 'crm.category', 'crm.product', 'crm.order', 'crm.comment'],
-    'custom_links': {
-        'auth': [{
-            'name': 'Start Chat',
-            'url': 'start_chat',
-            'icon': 'fas fa-comments'
-        }]
-    },
+    'order_with_respect_to': ['crm', 'crm.customer', 'crm.category', 'crm.product', 'crm.productoption', 'crm.productoptionprice',
+                              'crm.order', 'crm.comment', 'auth', 'authtoken'],
+
     'icons': {
         'auth': 'fas fa-users-cog',
         'auth.user': 'fas fa-user',
@@ -168,10 +162,11 @@ JAZZMIN_SETTINGS = {
         'crm.customer': 'far fa-user-circle',
         'crm.category': 'fas fa-layer-group',
         'crm.product': 'fas fa-hamburger',
+        'crm.productoption': 'fas fa-ellipsis-v',
+        'crm.productoptionprice': 'fas fa-list-ol',
         'crm.order': 'fas fa-car',
         'crm.comment': 'far fa-comment-alt',
         'authtoken.tokenproxy': 'fas fa-key',
     },
 
 }
-
